@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Virtual Office</title>
+<style>
+  body {
+    margin: 0;
+    font-family: sans-serif;
+    background: transparent;
+  }
+  #office {
+    text-align: center;
+    padding: 24px 12px;
+  }
+  #sprite {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 16px;
+    image-rendering: pixelated;
+    background-size: cover;
+    background-color: #ddd; /* 画像が無い間の仮の見た目 */
+    border-radius: 8px;
+  }
+  #sprite[data-status="wakeup"] { background-image: url('sprites/wakeup.png'); }
+  #sprite[data-status="sleep"]  { background-image: url('sprites/sleep.png'); }
+  #sprite[data-status="break"]  { background-image: url('sprites/break.png'); }
+
+  .buttons { display: flex; justify-content: center; gap: 8px; }
+  button {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #fff;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  button:hover { background: #f0f0f0; }
+</style>
+</head>
+<body>
+
+<div id="office">
+  <div id="sprite" data-status="wakeup"></div>
+  <div class="buttons">
+    <button onclick="logAction('sleep')">🛌 Sleep</button>
+    <button onclick="logAction('wakeup')">☀️ Wake up</button>
+    <button onclick="logAction('break')">☕ Break</button>
+  </div>
+</div>
+
+<script>
+  const WORKER_URL = "https://virtual-office-log.rudywarrior-oct24.workers.dev/";
+
+  async function logAction(action) {
+    // 先に見た目だけ即座に切り替える（Worker側の応答を待たない）
+    document.getElementById('sprite').dataset.status =
+      action === 'sleep' ? 'sleep' :
+      action === 'break' ? 'break' :
+      'wakeup';
+
+    try {
+      await fetch(`${WORKER_URL}/log`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+    } catch (e) {
+      console.error("ログ送信に失敗しました", e);
+    }
+  }
+
+  async function loadStatus() {
+    try {
+      const res = await fetch(`${WORKER_URL}/status`);
+      const { title } = await res.json();
+      const status =
+        title === "Sleep Time" ? "sleep" :
+        title === "Break Time" ? "break" :
+        "wakeup";
+      document.getElementById('sprite').dataset.status = status;
+    } catch (e) {
+      console.error("状態取得に失敗しました", e);
+    }
+  }
+
+  loadStatus();
+</script>
+
+</body>
+</html>
