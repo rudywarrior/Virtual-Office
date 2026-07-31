@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>Virtual Office Demo</title>
+<title>Virtual Office</title>
 <style>
   body {
     margin: 0;
@@ -14,29 +14,48 @@
     padding: 20px;
     color: #e8dcc8;
   }
-  h1 { font-size: 14px; letter-spacing: 2px; margin-bottom: 10px; }
 
-  /* ===== 上部ボタン ===== */
-  .buttons { margin-bottom: 14px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-  button {
-    background: #8b5e3c;
-    color: #fdf8f0;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 11px;
+  #action-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    position: relative;
   }
-  button:hover { background: #a9744f; }
-  button.work { background: #4d6f80; }
-  button.work:hover { background: #5f8aa0; }
+  .action-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: 2px solid #6b5a45;
+    background: #3a3530;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .action-btn:hover { background: #55483a; transform: translateY(-2px); }
+  .action-btn:active { transform: translateY(0); }
+  #action-tooltip {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2b2b2b;
+    color: #fdf8f0;
+    padding: 3px 8px;
+    font-size: 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    display: none;
+    pointer-events: none;
+    z-index: 20;
+  }
 
-  /* ===== シーン全体 ===== */
   #scene {
     position: relative;
-    width: 480px;
-    height: 320px;
+    width: 800px;
+    height: 480px;
     border: 4px solid #2b2b2b;
     border-radius: 4px;
     overflow: hidden;
@@ -45,25 +64,44 @@
     transition: background-color 2s ease;
   }
 
-  /* ===== ゾーン(仮素材:のちに画像に差し替え) ===== */
+  .room {
+    position: absolute;
+    border: 2px dashed #6b5a45;
+    border-radius: 4px;
+    font-size: 9px;
+    color: #8b7a63;
+    box-sizing: border-box;
+    padding: 4px;
+  }
+  #room-ldk     { left: 20px;  top: 20px;  width: 380px; height: 280px; }
+  #room-study   { left: 460px; top: 20px;  width: 150px; height: 150px; }
+  #room-desk    { left: 630px; top: 20px;  width: 150px; height: 150px; }
+  #room-bedroom { left: 460px; top: 190px; width: 320px; height: 270px; }
+
   .zone {
     position: absolute;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 10px;
+    font-size: 9px;
     color: #2b2b2b;
     border-radius: 4px;
     box-sizing: border-box;
+    text-align: center;
   }
-  #zone-desk   { left: 30px;  top: 30px;  width: 140px; height: 110px; background: #cbb994; border: 2px solid #8b5e3c; }
-  #zone-sofa   { left: 320px; top: 30px;  width: 130px; height: 90px;  background: #b7c9a8; border: 2px solid #6f8a5c; }
-  #zone-bed    { left: 320px; top: 170px; width: 130px; height: 110px; background: #a9b8d1; border: 2px solid #4d5f80; }
-  #zone-cage   { left: 30px;  top: 220px; width: 100px; height: 70px;  background: #d8cbb0; border: 2px dashed #8b5e3c; }
-  #zone-switch { left: 220px; top: 10px;  width: 40px;  height: 20px;  background: #444; border: 2px solid #222; font-size: 8px; color: #eee; }
-  #zone-floor-label { left: 10px; bottom: 6px; font-size: 9px; color: #8b7a63; }
+  #zone-sofa    { left: 40px;  top: 40px;  width: 140px; height: 80px;  background: #b7c9a8; border: 2px solid #6f8a5c; }
+  #zone-kitchen { left: 210px; top: 40px;  width: 150px; height: 55px;  background: #c9d3d8; border: 2px solid #8a9aa0; }
+  #zone-dining  { left: 210px; top: 110px; width: 150px; height: 80px;  background: #d8cbb0; border: 2px dashed #8b5e3c; }
+  #zone-bath    { left: 20px;  top: 320px; width: 170px; height: 80px;  background: #cfe0e6; border: 2px solid #7fa3ad; }
+  #zone-toilet  { left: 210px; top: 320px; width: 100px; height: 80px;  background: #dce6d8; border: 2px solid #8ba97f; }
+  #zone-switch  { left: 415px; top: 24px;  width: 30px;  height: 20px;  background: #444; border: 2px solid #222; font-size: 12px; }
+  #zone-study   { left: 480px; top: 45px;  width: 110px; height: 100px; background: #b9a8cc; border: 2px solid #6f5c8a; }
+  #zone-desk    { left: 650px; top: 45px;  width: 110px; height: 100px; background: #cbb994; border: 2px solid #8b5e3c; }
+  #zone-bed     { left: 480px; top: 210px; width: 150px; height: 90px;  background: #a9b8d1; border: 2px solid #4d5f80; }
+  #zone-catbed  { left: 480px; top: 320px; width: 40px;  height: 35px;  background: #f0d8a0; border: 2px dashed #b89a5a; }
+  #zone-cage    { left: 660px; top: 320px; width: 60px;  height: 55px;  background: #d8e0cf; border: 2px dashed #7fae6a; }
+  #zone-floor-label { left: 10px; bottom: 6px; font-size: 9px; color: #8b7a63; position: absolute; }
 
-  /* 照明のグロー(仮:黄色い光) */
   .lamp-glow {
     position: absolute;
     width: 46px; height: 46px;
@@ -73,10 +111,11 @@
     transition: opacity 1.2s ease;
     pointer-events: none;
   }
-  #lamp-desk { left: 78px; top: 55px; }
-  #lamp-sofa { left: 362px; top: 55px; }
+  #lamp-sofa  { left: 95px;  top: 65px; }
+  #lamp-desk  { left: 690px; top: 80px; }
+  #lamp-study { left: 520px; top: 80px; }
+  #lamp-bed   { left: 540px; top: 240px; }
 
-  /* ===== 主人公キャラクター ===== */
   #character {
     position: absolute;
     width: 16px;
@@ -84,11 +123,11 @@
     background: #d97757;
     border: 2px solid #2b2b2b;
     border-radius: 3px;
-    transition: left 0.9s linear, top 0.9s linear;
+    transition-property: left, top;
+    transition-timing-function: linear;
     z-index: 5;
   }
 
-  /* ===== 追加キャラクター(仮素材:静止プレースホルダー) ===== */
   .npc {
     position: absolute;
     width: 14px;
@@ -101,12 +140,14 @@
     align-items: center;
     justify-content: center;
     color: #2b2b2b;
+    transition-property: left, top;
+    transition-timing-function: linear;
+    cursor: pointer;
   }
-  #npc-woman { left: 355px; top: 55px; background: #e8b4d8; transition: left 1.4s linear, top 1.4s linear; cursor: pointer; }
-  #npc-cat   { left: 60px;  top: 245px; background: #f0d060; border-radius: 50%; transition: left 1s linear, top 1s linear; cursor: pointer; }
-  #npc-snake { left: 65px;  top: 255px; background: #7fae6a; width: 30px; height: 8px; border-radius: 6px; transition: left 1.6s linear, top 1.6s linear; cursor: pointer; }
+  #npc-woman { left: 355px; top: 65px;  background: #e8b4d8; }
+  #npc-cat   { left: 495px; top: 335px; background: #f0d060; border-radius: 50%; }
+  #npc-snake { left: 690px; top: 345px; background: #7fae6a; width: 28px; height: 8px; border-radius: 6px; }
 
-  /* ===== 吹き出し ===== */
   #speech-bubble {
     position: absolute;
     background: #fdf8f0;
@@ -120,7 +161,6 @@
     z-index: 6;
   }
 
-  /* ===== ツールチップ(特定ゾーンのみ) ===== */
   #tooltip {
     position: absolute;
     background: #2b2b2b;
@@ -136,29 +176,44 @@
 </head>
 <body>
 
-<h1>TINY OFFICE — DEMO</h1>
-
-<div class="buttons">
-  <button onclick="logAction('wakeup')">☀️ Wake up</button>
-  <button class="work" onclick="goToWork()">💼 作業</button>
-  <button onclick="logAction('break')">☕ Break</button>
-  <button onclick="logAction('sleep')">🛌 Sleep</button>
+<div id="action-bar">
+  <button class="action-btn" data-label="Wakeup(Log完了→Break Time作成)" data-action="wakeup">☀️</button>
+  <button class="action-btn" data-label="Break(Log完了→Break Time作成)" data-action="break">☕</button>
+  <button class="action-btn" data-label="Sleep(Log完了→Sleep Time作成)" data-action="sleep">🛌</button>
+  <button class="action-btn" data-label="作業(Actionページに遷移)" data-action="work">💼</button>
+  <button class="action-btn" data-label="書斎(ナレッジシェルフに遷移)" data-action="shelf">📚</button>
+  <button class="action-btn" data-label="Journal(今日のジャーナルに遷移)" data-action="journal">📖</button>
+  <button class="action-btn" data-label="キャプチャ(クイックメモ作成)" data-action="capture">📝</button>
+  <div id="action-tooltip"></div>
 </div>
 
 <div id="scene">
-  <div id="zone-desk" class="zone">DESK (work)</div>
-  <div id="zone-sofa" class="zone">SOFA (break)</div>
-  <div id="zone-bed" class="zone">BED (sleep)</div>
+  <div id="room-ldk" class="room">LDK</div>
+  <div id="room-study" class="room">STUDY</div>
+  <div id="room-desk" class="room">DESK ROOM</div>
+  <div id="room-bedroom" class="room">BEDROOM</div>
+
+  <div id="zone-sofa" class="zone">SOFA</div>
+  <div id="zone-kitchen" class="zone">KITCHEN</div>
+  <div id="zone-dining" class="zone">DINING</div>
+  <div id="zone-bath" class="zone">BATH</div>
+  <div id="zone-toilet" class="zone">TOILET</div>
+  <div id="zone-switch" class="zone">💡</div>
+  <div id="zone-study" class="zone">SHELF</div>
+  <div id="zone-desk" class="zone">DESK</div>
+  <div id="zone-bed" class="zone">BED</div>
+  <div id="zone-catbed" class="zone">CAT</div>
   <div id="zone-cage" class="zone">CAGE</div>
-  <div id="zone-switch" class="zone">SW</div>
   <div id="zone-floor-label">click anywhere to walk</div>
 
-  <div class="lamp-glow" id="lamp-desk"></div>
   <div class="lamp-glow" id="lamp-sofa"></div>
+  <div class="lamp-glow" id="lamp-desk"></div>
+  <div class="lamp-glow" id="lamp-study"></div>
+  <div class="lamp-glow" id="lamp-bed"></div>
 
   <div class="npc" id="npc-woman" title="同居人(仮)">女</div>
   <div class="npc" id="npc-cat" title="猫(仮)"></div>
-  <div class="npc" id="npc-snake" title="蛇(ケージ内・仮)"></div>
+  <div class="npc" id="npc-snake" title="蛇(仮・ケージ常駐)"></div>
 
   <div id="character"></div>
   <div id="speech-bubble"></div>
@@ -170,22 +225,58 @@
   const character = document.getElementById('character');
   const bubble = document.getElementById('speech-bubble');
   const tooltip = document.getElementById('tooltip');
+  const actionTooltip = document.getElementById('action-tooltip');
 
-  // ここをCloudflare WorkerのURLに書き換えてください
-  const WORKER_URL = "virtual-office-log.rudywarrior-oct24.workers.dev";
+  const WORKER_URL = "https://your-worker-name.your-subdomain.workers.dev";
+  const ACTION_URL = "https://www.notion.so/xxxxxのActionページID";
+  const KNOWLEDGE_SHELF_URL = "https://www.notion.so/xxxxxのナレッジシェルフページID";
 
-  // ここを実際のNotionページURLに書き換えてください
-  const JOURNAL_URL = "https://www.notion.so/xxxxxのジャーナルページID";
-  const WORK_URL  = "https://www.notion.so/301f58a616bd80d69b85ea18a1eea523";
-
-  // ---------- 状態ごとの目的地とセリフ ----------
-  const SPOTS = {
-    wakeup: { x: 90,  y: 75,  message: "今日もがんばろう" },
-    break:  { x: 375, y: 65,  message: "ちょっと休憩" },
-    sleep:  { x: 375, y: 215, message: "おやすみ..." },
-    work:   { x: 90,  y: 100, message: "よし、やるか" },
-    switch: { x: 232, y: 32,  message: null },
+  const ROOM_BOUNDS = {
+    ldk:     { x1: 20,  y1: 20,  x2: 400, y2: 300 },
+    study:   { x1: 460, y1: 20,  x2: 610, y2: 170 },
+    desk:    { x1: 630, y1: 20,  x2: 780, y2: 170 },
+    bedroom: { x1: 460, y1: 190, x2: 780, y2: 460 },
+    bath:    { x1: 20,  y1: 320, x2: 190, y2: 400 },
+    toilet:  { x1: 210, y1: 320, x2: 310, y2: 400 },
   };
+  const CLUSTER_HUB = {
+    ldk: { x: 300, y: 250 }, study: { x: 535, y: 95 }, desk: { x: 705, y: 95 },
+    bedroom: { x: 620, y: 380 }, bath: { x: 105, y: 360 }, toilet: { x: 260, y: 360 },
+  };
+  const PARENT = { study: 'ldk', bedroom: 'ldk', bath: 'ldk', toilet: 'ldk', desk: 'study' };
+  const DOOR = {
+    'ldk-study': { x: 435, y: 95 }, 'ldk-bedroom': { x: 435, y: 250 },
+    'ldk-bath': { x: 105, y: 310 }, 'ldk-toilet': { x: 260, y: 310 },
+    'study-desk': { x: 620, y: 95 },
+  };
+  function doorBetween(a, b) { return DOOR[`${a}-${b}`] || DOOR[`${b}-${a}`]; }
+  function pathToRoot(c) { const p = [c]; while (PARENT[p[p.length - 1]]) p.push(PARENT[p[p.length - 1]]); return p; }
+  function clustersPath(from, to) {
+    if (from === to) return [from];
+    const pf = pathToRoot(from), pt = pathToRoot(to), setPf = new Set(pf);
+    let lca = null;
+    for (const c of pt) { if (setPf.has(c)) { lca = c; break; } }
+    return [...pf.slice(0, pf.indexOf(lca) + 1), ...pt.slice(0, pt.indexOf(lca)).reverse()];
+  }
+  function pointInRoom(c, x, y) { const r = ROOM_BOUNDS[c]; return x >= r.x1 && x <= r.x2 && y >= r.y1 && y <= r.y2; }
+  function clusterOfPoint(x, y) {
+    for (const c in ROOM_BOUNDS) { if (pointInRoom(c, x, y)) return c; }
+    if (x < 430) return 'ldk';
+    if (y < 180) return 'study';
+    return 'bedroom';
+  }
+  function randomPointInRoom(c) {
+    const r = ROOM_BOUNDS[c], m = 20;
+    return { x: r.x1 + m + Math.random() * (r.x2 - r.x1 - m * 2), y: r.y1 + m + Math.random() * (r.y2 - r.y1 - m * 2) };
+  }
+  function buildWaypoints(fromCluster, toCluster, finalPoint) {
+    if (fromCluster === toCluster) return [CLUSTER_HUB[fromCluster], finalPoint];
+    const seq = clustersPath(fromCluster, toCluster);
+    const wp = [CLUSTER_HUB[fromCluster]];
+    for (let i = 0; i < seq.length - 1; i++) wp.push(doorBetween(seq[i], seq[i + 1]));
+    wp.push(finalPoint);
+    return wp;
+  }
 
   function showSpeech(x, y, message) {
     bubble.textContent = message;
@@ -195,230 +286,262 @@
     clearTimeout(bubble._t);
     bubble._t = setTimeout(() => { bubble.style.display = "none"; }, 2500);
   }
-
-  function moveCharacterTo(x, y, message) {
-    character.style.left = x + "px";
-    character.style.top  = y + "px";
-    if (message) showSpeech(x, y, message);
-  }
-
-  // ---------- ボタン操作 ----------
-  async function logAction(action) {
-    const spot = SPOTS[action];
-    if (spot) moveCharacterTo(spot.x, spot.y, spot.message);
-
-    if (action === 'wakeup') {
-      setTimeout(() => window.open(JOURNAL_URL, "_blank"), 900);
+  function animateMoverAlong(mover, waypoints, speed, onDone) {
+    let i = 0;
+    function step() {
+      if (i >= waypoints.length) { if (onDone) onDone(); return; }
+      const wp = waypoints[i++];
+      const dist = Math.hypot(wp.x - mover.pos.x, wp.y - mover.pos.y);
+      const duration = Math.min(6, Math.max(0.6, dist / speed));
+      mover.el.style.transitionDuration = duration + "s";
+      mover.el.style.left = wp.x + "px";
+      mover.el.style.top  = wp.y + "px";
+      mover.pos = { x: wp.x, y: wp.y };
+      mover._timer = setTimeout(step, duration * 1000);
     }
-
-    // Notion(logDB/ActionDB)への書き込みはこれまで通り
-    // try {
-    //   await fetch(`${WORKER_URL}/log`, {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({ action }),
-    //   });
-    // } catch (e) { console.error(e); }
+    clearTimeout(mover._timer);
+    step();
+  }
+  function moveMoverTo(mover, targetCluster, targetPoint, speed, message) {
+    const waypoints = buildWaypoints(mover.cluster, targetCluster, targetPoint);
+    animateMoverAlong(mover, waypoints, speed, () => {
+      mover.cluster = targetCluster;
+      if (message) showSpeech(mover.pos.x, mover.pos.y, message);
+    });
   }
 
-  function goToWork() {
-    moveCharacterTo(SPOTS.work.x, SPOTS.work.y, SPOTS.work.message);
-    setTimeout(() => window.open(ACTION_URL, "_blank"), 900);
+  const PLAYER_SPEED = 22;
+  const playerMover = { el: character, pos: { x: 705, y: 95 }, cluster: 'desk' };
+  let playerAsleep = false;
+
+  function moveCharacterTo(cluster, point, message) {
+    moveMoverTo(playerMover, cluster, point, PLAYER_SPEED, message);
   }
 
-  // ---------- クリックでの自由移動 + 特定ゾーンだけ説明あり ----------
-  const NAV_ZONES = [
-    {
-      el: document.getElementById('zone-desk'),
-      label: "Actionページに移動",
-      onClick: () => window.open(ACTION_URL, "_blank"),
-    }
-  ];
+  function schedulePlayerWander() {
+    clearTimeout(playerMover._wanderTimer);
+    const delay = 5000 + Math.random() * 6000;
+    playerMover._wanderTimer = setTimeout(() => {
+      if (!playerAsleep) {
+        const cluster = ['ldk', 'study', 'desk', 'bedroom'][Math.floor(Math.random() * 4)];
+        moveCharacterTo(cluster, randomPointInRoom(cluster), null);
+      }
+      schedulePlayerWander();
+    }, delay);
+  }
+  schedulePlayerWander();
+
+  async function postLog(action) {
+    try {
+      await fetch(`${WORKER_URL}/log`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+    } catch (e) { console.error("ログ送信に失敗しました", e); }
+  }
+
+  const ACTION_HANDLERS = {
+    wakeup: () => {
+      playerAsleep = false;
+      moveCharacterTo('ldk', { x: 100, y: 70 }, "今日もがんばろう");
+      postLog('wakeup');
+      const woman = NPCS.find(n => n.el.id === 'npc-woman');
+      if (woman && woman.awake) showSpeech(woman.pos.x, woman.pos.y, "おはよう");
+    },
+    break: () => {
+      moveCharacterTo('ldk', { x: 110, y: 80 }, "ちょっと休憩");
+      postLog('break');
+    },
+    sleep: () => {
+      playerAsleep = true;
+      moveCharacterTo('bedroom', { x: 555, y: 255 }, "おやすみ...");
+      postLog('sleep');
+    },
+    work: () => {
+      moveCharacterTo('desk', { x: 705, y: 95 }, "よし、やるか");
+      window.open(ACTION_URL, "_blank");
+    },
+    shelf: () => {
+      moveCharacterTo('study', { x: 535, y: 95 }, null);
+      window.open(KNOWLEDGE_SHELF_URL, "_blank");
+    },
+    journal: async () => {
+      showSpeech(playerMover.pos.x, playerMover.pos.y, "今日の日誌を探そう");
+      try {
+        const res = await fetch(`${WORKER_URL}/journal`);
+        const { url } = await res.json();
+        if (url) window.open(url, "_blank");
+        else alert("Journalページが見つかりませんでした");
+      } catch (e) { console.error(e); }
+    },
+    capture: async () => {
+      const text = prompt("メモを入力してください");
+      if (!text || !text.trim()) return;
+      showSpeech(playerMover.pos.x, playerMover.pos.y, "メモしておこう");
+      try {
+        await fetch(`${WORKER_URL}/capture`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text }),
+        });
+      } catch (e) { console.error("キャプチャ送信に失敗しました", e); }
+    },
+  };
+
+  document.querySelectorAll('.action-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const handler = ACTION_HANDLERS[btn.dataset.action];
+      if (handler) handler();
+    });
+    btn.addEventListener('mouseenter', () => {
+      actionTooltip.textContent = btn.dataset.label;
+      actionTooltip.style.display = "block";
+      const barRect = document.getElementById('action-bar').getBoundingClientRect();
+      const btnRect = btn.getBoundingClientRect();
+      actionTooltip.style.left = (btnRect.left - barRect.left + btnRect.width / 2) + "px";
+    });
+    btn.addEventListener('mouseleave', () => { actionTooltip.style.display = "none"; });
+  });
+
+  let lastKnownTitle = undefined;
+  async function pollStatus() {
+    try {
+      const res = await fetch(`${WORKER_URL}/status`);
+      const { title } = await res.json();
+      if (title === lastKnownTitle) return;
+      lastKnownTitle = title;
+      playerAsleep = (title === "Sleep Time");
+    } catch (e) { console.error("状態取得に失敗しました", e); }
+  }
+  pollStatus();
+  setInterval(pollStatus, 5 * 1000);
 
   scene.addEventListener('mousemove', (e) => {
     const rect = scene.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const hit = NAV_ZONES.find(z => {
-      const r = z.el.getBoundingClientRect();
-      return e.clientX >= r.left && e.clientX <= r.right &&
-             e.clientY >= r.top  && e.clientY <= r.bottom;
-    });
-
-    if (hit) {
-      tooltip.textContent = hit.label;
+    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+    const studyRect = document.getElementById('zone-study').getBoundingClientRect();
+    const deskRect  = document.getElementById('zone-desk').getBoundingClientRect();
+    const overStudy = e.clientX >= studyRect.left && e.clientX <= studyRect.right && e.clientY >= studyRect.top && e.clientY <= studyRect.bottom;
+    const overDesk  = e.clientX >= deskRect.left && e.clientX <= deskRect.right && e.clientY >= deskRect.top && e.clientY <= deskRect.bottom;
+    if (overStudy || overDesk) {
+      tooltip.textContent = overStudy ? "ナレッジシェルフに移動" : "Actionページに移動";
       tooltip.style.left = (x + 12) + "px";
       tooltip.style.top  = (y - 10) + "px";
       tooltip.style.display = "block";
-      scene.style.cursor = "pointer";
     } else {
       tooltip.style.display = "none";
     }
   });
 
   scene.addEventListener('click', (e) => {
+    if (playerAsleep) return;
     const rect = scene.getBoundingClientRect();
-    const x = e.clientX - rect.left - 8;
-    const y = e.clientY - rect.top - 8;
+    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+    const studyRect = document.getElementById('zone-study').getBoundingClientRect();
+    const deskRect  = document.getElementById('zone-desk').getBoundingClientRect();
 
-    const hit = NAV_ZONES.find(z => {
-      const r = z.el.getBoundingClientRect();
-      return e.clientX >= r.left && e.clientX <= r.right &&
-             e.clientY >= r.top  && e.clientY <= r.bottom;
-    });
-
-    if (hit) {
-      moveCharacterTo(x, y, null);
-      setTimeout(hit.onClick, 900);
-    } else {
-      moveCharacterTo(x, y, null);
+    if (e.clientX >= deskRect.left && e.clientX <= deskRect.right && e.clientY >= deskRect.top && e.clientY <= deskRect.bottom) {
+      ACTION_HANDLERS.work();
+      return;
     }
+    if (e.clientX >= studyRect.left && e.clientX <= studyRect.right && e.clientY >= studyRect.top && e.clientY <= studyRect.bottom) {
+      ACTION_HANDLERS.shelf();
+      return;
+    }
+    moveCharacterTo(clusterOfPoint(x, y), { x, y }, null);
   });
 
-  // ---------- 実時刻に連動した時間帯の演出 ----------
-  const DAY_SKY   = "#bcd6e8";
-  const DUSK_SKY  = "#e0a35c";
-  const NIGHT_SKY = "#1b2a4a";
-
-  let lightsOn = null; // 初回判定用にnullで開始
-
-  function isDarkHour(hour) {
-    return hour < 6 || hour >= 19;
+  const DAY_SKY = "#bcd6e8", DUSK_SKY = "#e0a35c", NIGHT_SKY = "#1b2a4a";
+  let lightsOn = null;
+  function isDarkHour(h) { return h < 6 || h >= 19; }
+  function updateSkyColor(h) {
+    scene.style.backgroundColor = (h >= 6 && h < 17) ? DAY_SKY : (h >= 17 && h < 19) ? DUSK_SKY : NIGHT_SKY;
   }
-
-  function updateSkyColor(hour) {
-    let bg;
-    if (hour >= 6 && hour < 17) bg = DAY_SKY;
-    else if (hour >= 17 && hour < 19) bg = DUSK_SKY;
-    else bg = NIGHT_SKY;
-    scene.style.backgroundColor = bg;
-  }
-
   function setLampGlow(on) {
-    document.getElementById('lamp-desk').style.opacity = on ? 1 : 0;
-    document.getElementById('lamp-sofa').style.opacity = on ? 1 : 0;
+    ["lamp-sofa", "lamp-desk", "lamp-study", "lamp-bed"].forEach(id => {
+      document.getElementById(id).style.opacity = on ? 1 : 0;
+    });
   }
-
-  // 朝/夜の切り替わりで、キャラがスイッチまで歩いて電気をつける/消す
   function performLightToggle(turnOn) {
-    moveCharacterTo(SPOTS.switch.x, SPOTS.switch.y, turnOn ? "電気をつけよう" : "電気を消そう");
-    setTimeout(() => setLampGlow(turnOn), 900);
-
-    // 電気を消す(=夜になる)タイミングでNPCも寝床へ、電気をつける(=朝)でNPCも起こす
-    if (typeof putNpcsToSleep === 'function') {
-      if (!turnOn) putNpcsToSleep();
-      else wakeNpcsUp();
+    if (!playerAsleep) {
+      moveCharacterTo('ldk', { x: 430, y: 34 }, turnOn ? "電気をつけよう" : "電気を消そう");
+      setTimeout(() => setLampGlow(turnOn), 900);
+    } else {
+      setLampGlow(turnOn);
     }
   }
-
   function tickRealClock() {
     const hour = new Date().getHours();
     updateSkyColor(hour);
     const dark = isDarkHour(hour);
-
-    if (lightsOn === null) {
-      lightsOn = dark; // 初回読み込みはアニメーションなしで反映
-      setLampGlow(lightsOn);
-    } else if (dark !== lightsOn) {
-      performLightToggle(dark);
-      lightsOn = dark;
-    }
+    if (lightsOn === null) { lightsOn = dark; setLampGlow(lightsOn); }
+    else if (dark !== lightsOn) { performLightToggle(dark); lightsOn = dark; }
   }
 
-  tickRealClock();
-  setInterval(tickRealClock, 60 * 1000); // 1分ごとに実時刻をチェック
-
-  // 初期位置
-  moveCharacterTo(SPOTS.wakeup.x, SPOTS.wakeup.y, null);
-
-  // ---------- NPC(女性・猫・蛇)の自由行動 ----------
-  let npcsAwake = !lightsOn; // 起動時点の昼夜判定に合わせる
-
+  const CAT_WAKE_MINUTE = 5 * 60 + Math.random() * 30;
+  const WANDER_CLUSTERS = ['ldk', 'study', 'desk', 'bedroom'];
   const NPCS = [
     {
-      el: document.getElementById('npc-woman'),
-      sleepSpot: { x: 390, y: 200 },
+      el: document.getElementById('npc-woman'), pos: { x: 355, y: 65 }, cluster: 'ldk',
+      sleepTarget: { cluster: 'bedroom', point: { x: 555, y: 245 } },
+      wakeMinute: 7 * 60, awake: true,
       lines: ["おかえりー", "今日もお疲れさま", "そろそろ休憩しない?", "何か手伝おうか?"],
-      wanderMs: [3000, 6000],
+      wanderMs: [5000, 9000], speed: 16,
     },
     {
-      el: document.getElementById('npc-cat'),
-      sleepSpot: { x: 55, y: 255 },
+      el: document.getElementById('npc-cat'), pos: { x: 495, y: 335 }, cluster: 'bedroom',
+      sleepTargets: [{ cluster: 'bedroom', point: { x: 495, y: 335 } }, { cluster: 'bedroom', point: { x: 610, y: 280 } }],
+      wakeMinute: CAT_WAKE_MINUTE, awake: true,
       lines: ["にゃー", "ゴロゴロ...", "にゃおん", "(しっぽをゆらす)"],
-      wanderMs: [2000, 4500],
-    },
-    {
-      el: document.getElementById('npc-snake'),
-      sleepSpot: { x: 60, y: 250 },
-      lines: null, // クリックしても何も話さない
-      wanderMs: [3500, 7000],
+      wanderMs: [4000, 7000], speed: 20,
     },
   ];
-
-  function randomFloorPoint() {
-    // シーン(480x320)の中で、歩かせても不自然になりにくい範囲
-    return {
-      x: 24 + Math.random() * (480 - 48),
-      y: 40 + Math.random() * (320 - 70),
-    };
-  }
-
-  function moveNpcTo(npc, x, y) {
-    npc.el.style.left = x + "px";
-    npc.el.style.top  = y + "px";
-  }
-
   function scheduleWander(npc) {
     const [min, max] = npc.wanderMs;
     const delay = min + Math.random() * (max - min);
-    clearTimeout(npc._timer);
-    npc._timer = setTimeout(() => {
-      if (npcsAwake) {
-        const p = randomFloorPoint();
-        moveNpcTo(npc, p.x, p.y);
+    clearTimeout(npc._wanderTimer);
+    npc._wanderTimer = setTimeout(() => {
+      if (npc.awake) {
+        const cluster = WANDER_CLUSTERS[Math.floor(Math.random() * WANDER_CLUSTERS.length)];
+        moveMoverTo(npc, cluster, randomPointInRoom(cluster), npc.speed, null);
       }
       scheduleWander(npc);
     }, delay);
   }
-
-  function putNpcsToSleep() {
-    npcsAwake = false;
-    NPCS.forEach(npc => moveNpcTo(npc, npc.sleepSpot.x, npc.sleepSpot.y));
+  function minutesNow() { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
+  function checkNpcSchedules() {
+    const now = minutesNow();
+    NPCS.forEach(npc => {
+      const shouldBeAwake = now >= npc.wakeMinute;
+      if (shouldBeAwake !== npc.awake) {
+        npc.awake = shouldBeAwake;
+        if (!shouldBeAwake) {
+          const target = npc.sleepTargets ? npc.sleepTargets[Math.floor(Math.random() * npc.sleepTargets.length)] : npc.sleepTarget;
+          moveMoverTo(npc, target.cluster, target.point, npc.speed, null);
+        }
+      }
+    });
   }
-
-  function wakeNpcsUp() {
-    npcsAwake = true; // 次回のscheduleWanderのタイミングで自然に動き出す
-  }
-
   NPCS.forEach(npc => {
     npc.el.addEventListener('click', (e) => {
-      e.stopPropagation(); // プレイヤーキャラの移動が誤発火しないように
-      const x = parseFloat(npc.el.style.left);
-      const y = parseFloat(npc.el.style.top);
-
-      if (!npcsAwake) {
-        showSpeech(x, y, "Zzz...");
-        return;
-      }
-      if (npc.lines) {
-        const line = npc.lines[Math.floor(Math.random() * npc.lines.length)];
-        showSpeech(x, y, line);
-      }
-      // linesがnull(蛇)の場合は何も反応しない
+      e.stopPropagation();
+      const { x, y } = npc.pos;
+      if (!npc.awake) { showSpeech(x, y, "Zzz..."); return; }
+      showSpeech(x, y, npc.lines[Math.floor(Math.random() * npc.lines.length)]);
     });
     scheduleWander(npc);
   });
+  checkNpcSchedules();
+  tickRealClock();
+  setInterval(() => { tickRealClock(); checkNpcSchedules(); }, 60 * 1000);
 
-  // ---------- 今後の拡張予定(足場のみ) ----------
-  // ルーティンごとの自動アクション:
-  // 例) 決まった時刻になったら logAction('wakeup') を自動で呼ぶ、
-  //     ActionDBのルーティン項目を見て自動で該当ゾーンへ移動する、等
-  // function checkRoutines() {
-  //   const now = new Date();
-  //   // ここでNotionのルーティンDBを参照し、時刻が一致したらlogAction()等を呼ぶ
-  // }
-  // setInterval(checkRoutines, 60 * 1000);
+  const snakeEl = document.getElementById('npc-snake');
+  const SNAKE_LINES = ["しゃー", "シュルシュル...", "(にらんでくる)"];
+  snakeEl.addEventListener('click', (e) => {
+    e.stopPropagation();
+    showSpeech(690, 345, SNAKE_LINES[Math.floor(Math.random() * SNAKE_LINES.length)]);
+  });
 </script>
 
 </body>
