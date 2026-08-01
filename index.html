@@ -78,6 +78,18 @@
   #room-desk    { left: 630px; top: 20px;  width: 150px; height: 150px; }
   #room-bedroom { left: 460px; top: 190px; width: 320px; height: 270px; }
 
+  /* 部屋同士を繋ぐ床色の通路(廊下・扉の代わり) */
+  .corridor {
+    position: absolute;
+    background: #d8cbb0;
+  }
+  #corridor-main          { left: 400px; top: 20px;  width: 60px;  height: 440px; }
+  #corridor-study-desk    { left: 610px; top: 45px;  width: 20px;  height: 100px; }
+  #corridor-study-bedroom { left: 480px; top: 170px; width: 110px; height: 20px; }
+  #corridor-desk-bedroom  { left: 650px; top: 170px; width: 110px; height: 20px; }
+  #corridor-ldk-bath      { left: 20px;  top: 300px; width: 170px; height: 20px; }
+  #corridor-ldk-toilet    { left: 210px; top: 300px; width: 100px; height: 20px; }
+
   .zone {
     position: absolute;
     display: flex;
@@ -188,6 +200,13 @@
 </div>
 
 <div id="scene">
+  <div id="corridor-main" class="corridor"></div>
+  <div id="corridor-study-desk" class="corridor"></div>
+  <div id="corridor-study-bedroom" class="corridor"></div>
+  <div id="corridor-desk-bedroom" class="corridor"></div>
+  <div id="corridor-ldk-bath" class="corridor"></div>
+  <div id="corridor-ldk-toilet" class="corridor"></div>
+
   <div id="room-ldk" class="room">LDK</div>
   <div id="room-study" class="room">STUDY</div>
   <div id="room-desk" class="room">DESK ROOM</div>
@@ -259,6 +278,21 @@
     return [...pf.slice(0, pf.indexOf(lca) + 1), ...pt.slice(0, pt.indexOf(lca)).reverse()];
   }
   function pointInRoom(c, x, y) { const r = ROOM_BOUNDS[c]; return x >= r.x1 && x <= r.x2 && y >= r.y1 && y <= r.y2; }
+  const CORRIDOR_BOUNDS = [
+    { x1: 400, y1: 20,  x2: 460, y2: 460 }, // メイン廊下
+    { x1: 610, y1: 45,  x2: 630, y2: 145 }, // 書斎-デスク
+    { x1: 480, y1: 170, x2: 590, y2: 190 }, // 書斎-寝室
+    { x1: 650, y1: 170, x2: 760, y2: 190 }, // デスク-寝室
+    { x1: 20,  y1: 300, x2: 190, y2: 320 }, // LDK-バス
+    { x1: 210, y1: 300, x2: 310, y2: 320 }, // LDK-トイレ
+  ];
+
+  function isWalkable(x, y) {
+    for (const c in ROOM_BOUNDS) { if (pointInRoom(c, x, y)) return true; }
+    for (const r of CORRIDOR_BOUNDS) { if (x >= r.x1 && x <= r.x2 && y >= r.y1 && y <= r.y2) return true; }
+    return false;
+  }
+
   function clusterOfPoint(x, y) {
     for (const c in ROOM_BOUNDS) { if (pointInRoom(c, x, y)) return c; }
     if (x < 430) return 'ldk';
@@ -449,6 +483,7 @@
       ACTION_HANDLERS.shelf();
       return;
     }
+    if (!isWalkable(x, y)) return;
     moveCharacterTo(clusterOfPoint(x, y), { x, y }, null);
   });
 
