@@ -168,13 +168,8 @@ export default {
 
     if (request.method === "OPTIONS") return new Response(null, { headers });
 
-    const API_PATHS = ["/log", "/status", "/journal", "/capture"];
-    const isApiRoute = API_PATHS.includes(url.pathname);
-
-    if (!isApiRoute) {
-      // index.html等の静的ファイルはここで配信する
-      return env.ASSETS.fetch(request);
-    }
+    // このWorkerは /log /status /journal /capture の時だけ呼ばれる想定
+    // (wrangler.jsoncのrun_worker_firstで絞っているため、それ以外はここに来ない)
 
     try {
       if (url.pathname === "/log" && request.method === "POST") {
