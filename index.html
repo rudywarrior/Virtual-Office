@@ -83,12 +83,13 @@
     position: absolute;
     background: #d8cbb0;
   }
-  #corridor-main          { left: 400px; top: 20px;  width: 60px;  height: 440px; }
-  #corridor-study-desk    { left: 610px; top: 45px;  width: 20px;  height: 100px; }
-  #corridor-study-bedroom { left: 480px; top: 170px; width: 110px; height: 20px; }
-  #corridor-desk-bedroom  { left: 650px; top: 170px; width: 110px; height: 20px; }
-  #corridor-ldk-bath      { left: 20px;  top: 300px; width: 170px; height: 20px; }
-  #corridor-ldk-toilet    { left: 210px; top: 300px; width: 100px; height: 20px; }
+  #corridor-main          { left: 400px; top: 75px;  width: 60px;  height: 40px; }
+  #corridor-main-2        { left: 400px; top: 230px; width: 60px;  height: 40px; }
+  #corridor-study-desk    { left: 610px; top: 75px;  width: 20px;  height: 40px; }
+  #corridor-study-bedroom { left: 505px; top: 170px; width: 60px;  height: 20px; }
+  #corridor-desk-bedroom  { left: 675px; top: 170px; width: 60px;  height: 20px; }
+  #corridor-ldk-bath      { left: 75px;  top: 300px; width: 60px;  height: 20px; }
+  #corridor-ldk-toilet    { left: 230px; top: 300px; width: 60px;  height: 20px; }
 
   .zone {
     position: absolute;
@@ -201,6 +202,7 @@
 
 <div id="scene">
   <div id="corridor-main" class="corridor"></div>
+  <div id="corridor-main-2" class="corridor"></div>
   <div id="corridor-study-desk" class="corridor"></div>
   <div id="corridor-study-bedroom" class="corridor"></div>
   <div id="corridor-desk-bedroom" class="corridor"></div>
@@ -247,7 +249,7 @@
   const actionTooltip = document.getElementById('action-tooltip');
 
   const WORKER_URL = "https://your-worker-name.your-subdomain.workers.dev";
-  const ACTION_URL = "https://www.notion.so/xxxxxのActionページID";
+  const ACTION_URL = "https://app.notion.com/p/W-O-R-K-O-F-F-I-C-E-301f58a616bd80d69b85ea18a1eea523";
   const KNOWLEDGE_SHELF_URL = "https://www.notion.so/xxxxxのナレッジシェルフページID";
 
   const ROOM_BOUNDS = {
@@ -279,12 +281,13 @@
   }
   function pointInRoom(c, x, y) { const r = ROOM_BOUNDS[c]; return x >= r.x1 && x <= r.x2 && y >= r.y1 && y <= r.y2; }
   const CORRIDOR_BOUNDS = [
-    { x1: 400, y1: 20,  x2: 460, y2: 460 }, // メイン廊下
-    { x1: 610, y1: 45,  x2: 630, y2: 145 }, // 書斎-デスク
-    { x1: 480, y1: 170, x2: 590, y2: 190 }, // 書斎-寝室
-    { x1: 650, y1: 170, x2: 760, y2: 190 }, // デスク-寝室
-    { x1: 20,  y1: 300, x2: 190, y2: 320 }, // LDK-バス
-    { x1: 210, y1: 300, x2: 310, y2: 320 }, // LDK-トイレ
+    { x1: 400, y1: 75,  x2: 460, y2: 115 }, // LDK-書斎
+    { x1: 400, y1: 230, x2: 460, y2: 270 }, // LDK-寝室
+    { x1: 610, y1: 75,  x2: 630, y2: 115 }, // 書斎-デスク
+    { x1: 505, y1: 170, x2: 565, y2: 190 }, // 書斎-寝室
+    { x1: 675, y1: 170, x2: 735, y2: 190 }, // デスク-寝室
+    { x1: 75,  y1: 300, x2: 135, y2: 320 }, // LDK-バス
+    { x1: 230, y1: 300, x2: 290, y2: 320 }, // LDK-トイレ
   ];
 
   function isWalkable(x, y) {
